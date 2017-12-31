@@ -1,0 +1,5 @@
+{
+    "a_test": "foo",
+    "a_ref": { "$ref": "./sub/base.json" },
+    "a_sib": { "$ref": "./prod.json"}
+}

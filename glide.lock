@@ -1,6 +1,14 @@
-hash: d8fa1d66857a29ffb6c87b53d097689d97eb7c3e5d00e8af689ab6d6e40aa856
-updated: 2017-12-29T18:37:07.963415924-05:00
+hash: c2dd73cb5af4f4e889cee6ff3a817235a7380925028c0b17d3356d214b20c1c5
+updated: 2017-12-31T16:33:36.2905367-05:00
 imports:
+- name: github.com/santhosh-tekuri/jsonschema
+  version: 63accc9deedeee33b7caf4e241f8a9ebdf031069
+- name: github.com/sirupsen/logrus
+  version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
+- name: github.com/xeipuuv/gojsonpointer
+  version: 6fe8760cad3569743d51ddbb243b26f8456742dc
+- name: github.com/xeipuuv/gojsonreference
+  version: e02fc20de94c78484cd5ffb007f8af96be030a45
 testImports: []
