@@ -1,7 +1,5 @@
 package utils
 
-import "fmt"
-
 var parentParseJSON map[string]interface{}
 var outJSON map[string]interface{}
 
@@ -16,40 +14,35 @@ func hasParent(jsonData map[string]interface{}) bool {
 	return false
 }
 
-func resolveParents(basePath string, rawJSON map[string]interface{}) (map[string]interface{}, error) {
-	var outData map[string]interface{}
-
-	outData = make(map[string]interface{})
-
+func resolveParents(basePath string, rawJSON map[string]interface{}) {
 	for k, v := range rawJSON {
 		if k == "@parent" {
 			if vp, ok := v.([]interface{}); ok {
 				for _, it := range vp {
 					if itm, mok := it.(map[string]interface{}); mok {
-						for ck, cv := range itm {
-							if ck == "$ref" {
-								if cvs, cok := cv.(string); cok {
-									copyJSON(basePath, cvs, &outData)
-								}
+						if hasParent(itm) {
+							resolveParents(basePath, itm)
+						} else {
+							for vk, vv := range itm {
+								outJSON[vk] = vv
 							}
 						}
 					}
 				}
 			}
+		} else {
+			outJSON[k] = v
 		}
 	}
-
-	return outData, nil
 }
 
 // ParseFileParent Dummy
 func ParseFileParent(filePath string, inJSON map[string]interface{}) (map[string]interface{}, error) {
+	outJSON = make(map[string]interface{})
 	parentParseJSON = inJSON
 
 	if hasParent(parentParseJSON) {
-		fmt.Println("HAS PARENT")
-		fmt.Println(parentParseJSON)
-		outJSON, _ = resolveParents(filePath, parentParseJSON)
+		resolveParents(filePath, parentParseJSON)
 
 		return outJSON, nil
 	}

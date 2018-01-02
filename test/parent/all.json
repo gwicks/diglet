@@ -1,4 +1,4 @@
 {
-    "master": "grandparent_flag",
+    "all": "grandparent_flag",
     "dev": "grandparent_flag"
 }
