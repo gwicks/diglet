@@ -17,7 +17,7 @@ func main() {
 
 func makeGlobalApp() *cli.App {
 	app := cli.NewApp()
-	app.Name = "diglett"
+	app.Name = "lincoln"
 	// app.Before = config.Setup
 	app.Usage = "JSON Compiler and Schema Validator"
 	// app.Action = run
