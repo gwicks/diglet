@@ -10,7 +10,8 @@ import (
 func compileAction(c *cli.Context) error {
 	cmdArgs := c.Args()
 	if len(cmdArgs) > 0 {
-		resultJSON, _ := utils.ParseFileRefs(cmdArgs[0])
+		resultJSON, _ := utils.ParseFileParent(cmdArgs[0])
+		// resultJSON, _ := utils.ParseFileRefs(cmdArgs[0])
 		fmt.Println(resultJSON)
 	} else {
 		fmt.Println("Must specify a JSON file to compile")

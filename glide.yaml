@@ -6,7 +6,3 @@ import:
   version: ^1.0.0
 - package: github.com/santhosh-tekuri/jsonschema
   version: ^1.0.0
-- package: github.com/xeipuuv/gojsonpointer
-  version: master
-- package: github.com/xeipuuv/gojsonreference
-  version: master
