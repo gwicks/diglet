@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/gwicks/diglett/commands"
+	"github.com/gwicks/lincoln/commands"
 	"github.com/urfave/cli"
 )
 

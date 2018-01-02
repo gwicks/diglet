@@ -3,7 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/gwicks/diglett/utils"
+	"github.com/gwicks/lincoln/utils"
 	"github.com/urfave/cli"
 )
 
