@@ -1,9 +1,6 @@
 package utils
 
-import (
-	"encoding/json"
-	"io/ioutil"
-)
+import "fmt"
 
 var parentParseJSON map[string]interface{}
 var outJSON map[string]interface{}
@@ -23,6 +20,7 @@ func resolveParents(basePath string, rawJSON map[string]interface{}) (map[string
 	var outData map[string]interface{}
 
 	outData = make(map[string]interface{})
+
 	for k, v := range rawJSON {
 		if k == "@parent" {
 			if vp, ok := v.([]interface{}); ok {
@@ -41,26 +39,16 @@ func resolveParents(basePath string, rawJSON map[string]interface{}) (map[string
 		}
 	}
 
-	// delete(parentParseJSON, "@parent")
-	// for k, v := range parentParseJSON {
-	// 	outData[k] = v
-	// }
-
 	return outData, nil
 }
 
 // ParseFileParent Dummy
-func ParseFileParent(filePath string) (map[string]interface{}, error) {
-	parentParseJSON = make(map[string]interface{})
-
-	fd, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	json.Unmarshal(fd, &parentParseJSON)
+func ParseFileParent(filePath string, inJSON map[string]interface{}) (map[string]interface{}, error) {
+	parentParseJSON = inJSON
 
 	if hasParent(parentParseJSON) {
+		fmt.Println("HAS PARENT")
+		fmt.Println(parentParseJSON)
 		outJSON, _ = resolveParents(filePath, parentParseJSON)
 
 		return outJSON, nil

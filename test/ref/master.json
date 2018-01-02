@@ -1,5 +1,7 @@
 {
     "a_test": "foo",
     "a_ref": { "$ref": "./sub/base.json" },
-    "a_sib": { "$ref": "./prod.json"}
+    "a_obj": {
+        "a_child": { "$ref": "./prod.json"}
+    }
 }

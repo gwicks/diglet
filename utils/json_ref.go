@@ -24,19 +24,41 @@ func copyJSON(basePath string, filePath string, targetJSON *map[string]interface
 	return vsj
 }
 
+func isRef(refJSON map[string]interface{}) (string, bool) {
+	if len(refJSON) == 1 {
+		if rk, rok := refJSON["$ref"].(string); rok {
+			return rk, true
+		}
+	}
+	return "", false
+}
+
 func resolveRefs(basePath string, rawJSON map[string]interface{}) error {
 	for _, v := range rawJSON {
 		switch v.(type) {
 		case map[string]interface{}:
 			if rv, ok := v.(map[string]interface{}); ok {
-				for ak, av := range rv {
-					if ak == "$ref" {
-						if avk, aok := av.(string); aok {
-							currentPaths := copyJSON(basePath, avk, &rv)
-							resolveRefs(currentPaths, rv)
-						}
+				refPath, ir := isRef(rv)
+				if ir {
+					currentPaths := copyJSON(basePath, refPath, &rv)
+					resolveRefs(currentPaths, rv)
+				} else {
+					resolveRefs(basePath, rv)
+				}
+			}
+		case []interface{}:
+			if rv, ok := v.([]interface{}); ok {
+				for _, itm := range rv {
+					if itmv, iok := itm.(map[string]interface{}); iok {
+						resolveRefs(basePath, itmv)
 					}
 				}
+			}
+		case string:
+			refPath, ir := isRef(rawJSON)
+			if ir {
+				currentPaths := copyJSON(basePath, refPath, &rawJSON)
+				resolveRefs(currentPaths, rawJSON)
 			}
 		}
 	}
@@ -44,15 +66,8 @@ func resolveRefs(basePath string, rawJSON map[string]interface{}) error {
 }
 
 // ParseFileRefs Dummy
-func ParseFileRefs(filePath string) (map[string]interface{}, error) {
-	parentJSON = make(map[string]interface{})
-
-	fd, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	json.Unmarshal(fd, &parentJSON)
+func ParseFileRefs(filePath string, inJSON map[string]interface{}) (map[string]interface{}, error) {
+	parentJSON = inJSON
 
 	resolveRefs(filePath, parentJSON)
 

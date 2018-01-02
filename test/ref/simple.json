@@ -1,0 +1,9 @@
+{
+    "a": "c",
+    "b": {
+        "b_child": { "$ref": "./prod.json" },
+        "b_child_array": [ { "$ref": "./prod.json" } ]
+    },
+    "c": { "$ref": "./prod.json" },
+    "d": [1,2,3,4]
+}
