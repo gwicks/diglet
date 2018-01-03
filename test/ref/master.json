@@ -2,6 +2,10 @@
     "a_test": "foo",
     "a_ref": { "$ref": "./sub/base.json" },
     "a_obj": {
+        "a_first_child": "bar",
         "a_child": { "$ref": "./prod.json"}
+    },
+    "a_relref": { 
+        "a_child_two": {"$ref": "#/a_obj/a_first_child"} 
     }
 }

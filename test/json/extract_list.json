@@ -1,0 +1,6 @@
+{
+    "just_a_list": ["just_a_value"],
+
+    "test": {"$ref": "#/just_a_list"},
+    "result": ["just_a_value"]
+}

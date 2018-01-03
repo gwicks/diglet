@@ -1,0 +1,22 @@
+{
+    "test": {
+        "@parent": [
+            {
+                "@parent": 
+                    {
+                        "grandparent1": true
+                    } 
+            }, 
+            {
+                "@parent":
+                    [{
+                        "grandparent2": true
+                    }]
+            }
+        ]
+    }, 
+    "result": {
+        "grandparent1": true,
+        "grandparent2": true
+    }
+}

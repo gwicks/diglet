@@ -1,0 +1,25 @@
+{
+    "schema_pass": false,
+    "foo": {
+        "bar": "baz"
+    },
+    "qux": {
+        "@doc": {
+            "resolve": false
+        },
+        "$ref": "#/foo"
+    },
+    "test": {
+        "foo": {
+            "@schemas": {
+                "nested_schema": {
+                    "$ref": "../schemafiles/nested_schema.json"
+                }
+            }
+        }
+    },
+    "result": {
+        "foo": {
+        }
+    }
+}

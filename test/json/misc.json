@@ -1,0 +1,37 @@
+{
+    "greatgrandparent":
+        {
+            "the good old days": "PEANUTS",
+            "overridable": "greatgrandparent",
+            "locked": "greatgrandparent"
+        },
+    "grandparent":
+        {
+            "@parent": {"$ref": "#/greatgrandparent"},
+            "the good old days": "Werther's Originals",
+            "overridable": "grandparent",
+            "locked": "grandparent"
+        },
+    "parent":
+        {
+            "@parent": {"$ref": "#/grandparent"},
+            "@lock_names": ["locked"],
+            "overridable": "parent",
+            "locked": "parent"
+        },
+    "child":
+        {
+            "@parent": {"$ref": "#/parent"},
+            "overridable": "child",
+            "locked": "child"
+        },
+
+    "test": {"$ref": "#/child"},
+    "result":
+        {
+            "@lock_names": ["locked"],
+            "the good old days": "Werther's Originals",
+            "overridable": "child",
+            "locked": "parent"
+        }
+}

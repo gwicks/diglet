@@ -10,6 +10,10 @@ func hasParent(jsonData map[string]interface{}) bool {
 		if len(pa) > 0 {
 			return true
 		}
+	} else {
+		if _, sok := jsonData["@parent"].(map[string]interface{}); sok {
+			return true
+		}
 	}
 	return false
 }
@@ -29,6 +33,16 @@ func resolveParents(basePath string, rawJSON map[string]interface{}) {
 						}
 					}
 				}
+			} else {
+				if sp, sok := v.(map[string]interface{}); sok {
+					if hasParent(sp) {
+						resolveParents(basePath, sp)
+					} else {
+						for vk, vv := range sp {
+							outJSON[vk] = vv
+						}
+					}
+				}
 			}
 		} else {
 			outJSON[k] = v
@@ -41,11 +55,7 @@ func ParseFileParent(filePath string, inJSON map[string]interface{}) (map[string
 	outJSON = make(map[string]interface{})
 	parentParseJSON = inJSON
 
-	if hasParent(parentParseJSON) {
-		resolveParents(filePath, parentParseJSON)
+	resolveParents(filePath, parentParseJSON)
 
-		return outJSON, nil
-	}
-
-	return parentParseJSON, nil
+	return outJSON, nil
 }

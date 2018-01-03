@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
+
+	jsonref "github.com/xeipuuv/gojsonreference"
 )
 
 var parentJSON map[string]interface{}
@@ -34,14 +36,21 @@ func isRef(refJSON map[string]interface{}) (string, bool) {
 }
 
 func resolveRefs(basePath string, rawJSON map[string]interface{}) error {
-	for _, v := range rawJSON {
+	for k, v := range rawJSON {
 		switch v.(type) {
 		case map[string]interface{}:
 			if rv, ok := v.(map[string]interface{}); ok {
 				refPath, ir := isRef(rv)
 				if ir {
-					currentPaths := copyJSON(basePath, refPath, &rv)
-					resolveRefs(currentPaths, rv)
+					if string(refPath[0]) == "#" {
+						jref, _ := jsonref.NewJsonReference(refPath)
+						refVal, _, _ := jref.GetPointer().Get(parentJSON)
+
+						rawJSON[k] = refVal
+					} else {
+						currentPaths := copyJSON(basePath, refPath, &rv)
+						resolveRefs(currentPaths, rv)
+					}
 				} else {
 					resolveRefs(basePath, rv)
 				}

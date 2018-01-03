@@ -1,8 +1,4 @@
 {
-    "@parent": [
-        {
-            "$ref": "./master.json"
-        }
-    ],
+    "@parent": { "$ref": "./master.json" },
     "dev": "child_flag"
 }

@@ -1,0 +1,10 @@
+{
+    "just_a_dict": {
+        "just_a_key": "just_a_value"
+    },
+
+    "test": {"$ref": "#/just_a_dict"},
+    "result": {
+        "just_a_key": "just_a_value"
+    }
+}

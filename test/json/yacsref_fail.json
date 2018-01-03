@@ -1,0 +1,17 @@
+{
+    "test": {
+        "list": [{"$ref": "#/nope", "optional": true}, {"$ref": "#/nope", "default": "value"}],
+        "local_optional": {"$ref": "#/nope", "optional": true},
+        "local_default": {"$ref": "#/nope", "default": "local_value"},
+        "remote_optional": {"$ref": "http://fakeserver.invalid/#/nope", "optional": true},
+        "remote_default": {"$ref": "http://fakeserver.invalid/#/nope", "default": "remote_value"},
+        "default_overrides_optional": {"$ref": "#/nope", "default": "local_value", "optional": true}
+    },
+
+    "result": {
+        "list": ["value"],
+        "local_default": "local_value",
+        "remote_default": "remote_value",
+        "default_overrides_optional": "local_value"
+    }
+}

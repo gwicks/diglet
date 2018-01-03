@@ -27,7 +27,7 @@ func compileAction(c *cli.Context) error {
 
 		finalJSON, _ := utils.ParseFileParent(cmdArgs[0], resultJSON)
 
-		resultStr, _ := json.Marshal(finalJSON)
+		resultStr, _ := json.MarshalIndent(finalJSON, "", "    ")
 
 		fmt.Println(string(resultStr))
 	} else {

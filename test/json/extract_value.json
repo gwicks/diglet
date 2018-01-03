@@ -1,0 +1,6 @@
+{
+    "just_a_key": "just_a_value",
+
+    "test": {"$ref": "#/just_a_key"},
+    "result": "just_a_value"
+}

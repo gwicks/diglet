@@ -1,0 +1,20 @@
+{
+    "parent1": {
+        "unique1": "parent1",
+        "duplicate": "parent1"
+    },
+    "parent2": {
+        "unique2": "parent2",
+        "duplicate": "parent2"
+    },
+    "child": {
+        "@parent": [{"$ref": "#/parent1"}, {"$ref": "#/parent2"}]
+    },
+
+    "test": {"$ref": "#/child"},
+    "result": {
+        "unique1": "parent1",
+        "unique2": "parent2",
+        "duplicate": "parent2"
+    }
+}
