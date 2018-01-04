@@ -2,7 +2,6 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -93,11 +92,6 @@ func queryFile(filePath string, query string) interface{} {
 }
 
 func resolveRefs(basePath string, inputJSON interface{}) error {
-	fmt.Println("PASSED IN TO RESOLVE: ")
-	fmt.Println(inputJSON)
-	fmt.Println("WITH BASE PATH: ")
-	fmt.Println(basePath)
-
 	if rawJSON, rok := inputJSON.(map[string]interface{}); rok {
 		for k, v := range rawJSON {
 			switch v.(type) {
@@ -166,9 +160,8 @@ func resolveRefs(basePath string, inputJSON interface{}) error {
 								if childMap, mok := child.(map[string]interface{}); mok {
 									refPathc, isr := isRef(childMap)
 									if isr {
-										fmt.Println(child)
 										currentPath, copyErr := copyJSON(basePath, refPathc, &childMap)
-										fmt.Println(currentPath)
+
 										if copyErr != nil {
 											log.Error(copyErr)
 											return copyErr
@@ -190,7 +183,6 @@ func resolveRefs(basePath string, inputJSON interface{}) error {
 						}
 
 					case map[string]interface{}:
-						fmt.Println("IS MAP STRING")
 						currentPaths, copyErr := copyJSON(basePath, refPath, &rawJSON)
 						if copyErr != nil {
 							log.Error(copyErr)
@@ -203,7 +195,6 @@ func resolveRefs(basePath string, inputJSON interface{}) error {
 			}
 		}
 	} else {
-		fmt.Println("NOT MAPSTR")
 		if rawJSON, rok := inputJSON.([]interface{}); rok {
 			for cidx, child := range rawJSON {
 				if childObj, bok := child.(map[string]interface{}); bok {

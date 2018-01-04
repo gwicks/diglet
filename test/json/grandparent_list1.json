@@ -14,7 +14,7 @@
                     }
             }
         ]
-    }, 
+    },
     "result": {
         "grandparent1": true,
         "grandparent2": true

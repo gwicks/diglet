@@ -1,8 +1,11 @@
 package utils
 
+import "fmt"
+
 var parentParseJSON map[string]interface{}
 var outJSON map[string]interface{}
 
+var lastParent map[string]interface{}
 var currentPathParent string
 
 func hasParent(jsonData map[string]interface{}) bool {
@@ -19,33 +22,65 @@ func hasParent(jsonData map[string]interface{}) bool {
 }
 
 func resolveParents(basePath string, rawJSON map[string]interface{}) {
+	fmt.Println("PARENT RESOLVE FOR")
+	fmt.Println(rawJSON)
+	// fmt.Println("WRITING TO OUTPUT OBJECT")
+	// fmt.Println(outJSON)
 	for k, v := range rawJSON {
 		if k == "@parent" {
 			if vp, ok := v.([]interface{}); ok {
+				fmt.Println("FOUND ARRAY OF PARENTS")
 				for _, it := range vp {
 					if itm, mok := it.(map[string]interface{}); mok {
 						if hasParent(itm) {
+							lastParent = rawJSON
 							resolveParents(basePath, itm)
 						} else {
-							for vk, vv := range itm {
-								outJSON[vk] = vv
+							fmt.Println("---------")
+							fmt.Println(itm)
+							fmt.Println("COPY INTO")
+							fmt.Println(lastParent)
+							delete(rawJSON, "@parent")
+							if lastParent != nil {
+								for vk, vv := range itm {
+									lastParent[vk] = vv
+								}
+								delete(lastParent, "@parent")
+							} else {
+								for vk, vv := range itm {
+									rawJSON[vk] = vv
+								}
 							}
+
 						}
 					}
 				}
 			} else {
 				if sp, sok := v.(map[string]interface{}); sok {
+					fmt.Println("FOUND SINGLE PARENT")
 					if hasParent(sp) {
+						lastParent = rawJSON
 						resolveParents(basePath, sp)
 					} else {
-						for vk, vv := range sp {
-							outJSON[vk] = vv
+						delete(rawJSON, "@parent")
+						if lastParent != nil {
+							for vk, vv := range sp {
+								lastParent[vk] = vv
+							}
+							delete(lastParent, "@parent")
+						} else {
+							for vk, vv := range sp {
+								rawJSON[vk] = vv
+							}
 						}
 					}
 				}
 			}
 		} else {
-			outJSON[k] = v
+			fmt.Println("NO PARENT")
+			if targetObj, ok := v.(map[string]interface{}); ok {
+				resolveParents(basePath, targetObj)
+			}
 		}
 	}
 }
@@ -57,5 +92,5 @@ func ParseFileParent(filePath string, inJSON map[string]interface{}) (map[string
 
 	resolveParents(filePath, parentParseJSON)
 
-	return outJSON, nil
+	return parentParseJSON, nil
 }
