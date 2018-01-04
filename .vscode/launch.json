@@ -8,8 +8,15 @@
             "name": "Launch Package",
             "type": "go",
             "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceRoot}"
+            "remotePath": "${workspaceRoot}",
+            "mode": "remote",
+            "program": "${workspaceRoot}",
+            "port": 2345,
+	        "host": "127.0.0.1",
+            "args": [
+                "compile",
+                "test/json/embed_list.json"
+            ]
         }
     ]
 }

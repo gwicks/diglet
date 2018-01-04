@@ -1,8 +1,0 @@
-{
-    "@parent": [
-        {
-            "$ref": "./all.json"
-        }
-    ],
-    "production": "parent_flag"
-}

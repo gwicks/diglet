@@ -12,7 +12,7 @@
     "test": {
         "@schemas" : {
             "doc_resolve" : {
-                "$ref" : "../schemafiles/doc_resolve.json"
+                "$ref" : "../schema/doc_resolve.json"
             }
         },
         "resolved": {

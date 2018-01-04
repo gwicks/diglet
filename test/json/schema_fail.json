@@ -12,7 +12,7 @@
     "test": {
         "@schemas" : {
             "schema_fail" : {
-                "$ref" : "../schemafiles/schema_fail.json"
+                "$ref" : "../schema/schema_fail.json"
             }
         },
         "resolved": {

@@ -13,7 +13,7 @@
         "foo": {
             "@schemas": {
                 "nested_schema": {
-                    "$ref": "../schemafiles/nested_schema.json"
+                    "$ref": "../schema/nested_schema.json"
                 }
             }
         }

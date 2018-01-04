@@ -6,18 +6,19 @@ import (
 	"io/ioutil"
 
 	"github.com/gwicks/lincoln/utils"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 
-var rootJSON map[string]interface{}
+var rootJSON interface{}
 
 func compileAction(c *cli.Context) error {
 	cmdArgs := c.Args()
 	if len(cmdArgs) > 0 {
-		rootJSON = make(map[string]interface{})
 
 		fd, err := ioutil.ReadFile(cmdArgs[0])
 		if err != nil {
+			log.Error(err)
 			return err
 		}
 
@@ -25,11 +26,20 @@ func compileAction(c *cli.Context) error {
 
 		resultJSON, _ := utils.ParseFileRefs(cmdArgs[0], rootJSON)
 
-		finalJSON, _ := utils.ParseFileParent(cmdArgs[0], resultJSON)
+		if resultJSONObj, ok := resultJSON.(map[string]interface{}); ok {
+			finalJSON, _ := utils.ParseFileParent(cmdArgs[0], resultJSONObj)
 
-		resultStr, _ := json.MarshalIndent(finalJSON, "", "    ")
+			resultStr, _ := json.MarshalIndent(finalJSON, "", "    ")
 
-		fmt.Println(string(resultStr))
+			fmt.Println(string(resultStr))
+		} else {
+			resultStr, _ := json.MarshalIndent(resultJSON, "", "    ")
+
+			fmt.Println(string(resultStr))
+		}
+
+		// validatedJSON, _ := utils.ParseFileSchema(cmdArgs[0], finalJSON)
+
 	} else {
 		fmt.Println("Must specify a JSON file to compile")
 	}

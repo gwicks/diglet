@@ -1,6 +1,0 @@
-{
-    "b_test": "bar",
-    "b_ref": [
-        { "$ref": "./sibling.json" }
-    ]
-}

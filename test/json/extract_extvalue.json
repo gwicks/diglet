@@ -1,0 +1,5 @@
+{
+    "just_another_key": "just_a_value",
+
+    "test_two": {"$ref": "./extract_value.json#/just_a_key"}
+}
