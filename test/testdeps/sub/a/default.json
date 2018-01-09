@@ -1,3 +1,7 @@
 {
-    "name": "title"
+    "name": "title",
+    "slots": {
+        "pre": [ "test_one" ],
+        "post": []
+    }
 }

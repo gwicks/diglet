@@ -1,8 +1,15 @@
-hash: c2dd73cb5af4f4e889cee6ff3a817235a7380925028c0b17d3356d214b20c1c5
-updated: 2018-01-03T11:30:53.519164-05:00
+hash: 61bb28762abd15865873f7e30d81e532acc317ec7b7ebc122854dc40787b93e4
+updated: 2018-01-09T15:04:52.642225579-05:00
 imports:
+- name: github.com/imdario/mergo
+  version: 7fe0c75c13abdee74b09fcacef5ea1c6bba6a874
+  subpackages:
+  - releases
 - name: github.com/santhosh-tekuri/jsonschema
   version: 63accc9deedeee33b7caf4e241f8a9ebdf031069
+  subpackages:
+  - formats
+  - loader
 - name: github.com/sirupsen/logrus
   version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
 - name: github.com/urfave/cli
@@ -11,4 +18,13 @@ imports:
   version: 6fe8760cad3569743d51ddbb243b26f8456742dc
 - name: github.com/xeipuuv/gojsonreference
   version: e02fc20de94c78484cd5ffb007f8af96be030a45
+- name: golang.org/x/crypto
+  version: 94eea52f7b742c7cbe0b03b22f0c4c8631ece122
+  subpackages:
+  - ssh/terminal
+- name: golang.org/x/sys
+  version: 53aa286056ef226755cd898109dbcdaba8ac0b81
+  subpackages:
+  - unix
+  - windows
 testImports: []

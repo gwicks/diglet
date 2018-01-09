@@ -39,24 +39,27 @@ func doValidation(scmURI string, scmDat map[string]interface{}, targetObj interf
 		return err
 	}
 
-	schema, err := compiler.Compile(url)
-	if err != nil {
-		return err
+	schema, serr := compiler.Compile(url)
+	if serr != nil {
+		return serr
 	}
 
-	if err = schema.Validate(strings.NewReader(string(marshaledObj))); err != nil {
-		return err
+	if verr := schema.Validate(strings.NewReader(string(marshaledObj))); verr != nil {
+		return verr
 	}
 	return nil
 }
 
-func validateSchema(basePath string, inputJSON interface{}) {
+func validateSchema(basePath string, inputJSON interface{}) error {
 	if rawJSON, rok := inputJSON.(map[string]interface{}); rok {
 		for k, v := range rawJSON {
 			if k == "@schemas" {
 				schmURI, currentSchema := schemaForObject(rawJSON)
 				if currentSchemaMap, sok := currentSchema.(map[string]interface{}); sok {
-					validErr = doValidation(schmURI, currentSchemaMap, rawJSON)
+					tmperr := doValidation(schmURI, currentSchemaMap, rawJSON)
+					if tmperr != nil {
+						return tmperr
+					}
 				}
 			} else {
 				switch v.(type) {
@@ -64,7 +67,10 @@ func validateSchema(basePath string, inputJSON interface{}) {
 					if objData, ok := v.(map[string]interface{}); ok {
 						schmURI, currentSchema := schemaForObject(objData)
 						if currentSchemaMap, sok := currentSchema.(map[string]interface{}); sok {
-							validErr = doValidation(schmURI, currentSchemaMap, v)
+							tmperr := doValidation(schmURI, currentSchemaMap, v)
+							if tmperr != nil {
+								return tmperr
+							}
 						}
 						validateSchema(basePath, objData)
 					}
@@ -82,13 +88,15 @@ func validateSchema(basePath string, inputJSON interface{}) {
 			}
 		}
 	}
+	return nil
 }
 
 // ParseFileSchema Dummy
 func ParseFileSchema(filePath string, inJSON map[string]interface{}) (map[string]interface{}, error) {
+	validErr = nil
 	rootJSON = inJSON
 
-	validateSchema(filePath, rootJSON)
+	validErr := validateSchema(filePath, rootJSON)
 	if validErr != nil {
 		return rootJSON, validErr
 	}

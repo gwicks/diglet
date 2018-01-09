@@ -11,6 +11,7 @@ func main() {
 	app := makeGlobalApp()
 	app.Commands = []cli.Command{}
 	app.Commands = append(app.Commands, commands.CompileCommand())
+	app.Commands = append(app.Commands, commands.BatchCommand())
 
 	app.Run(os.Args)
 }

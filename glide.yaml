@@ -10,3 +10,5 @@ import:
   version: master
 - package: github.com/xeipuuv/gojsonreference
   version: master
+- package: github.com/imdario/mergo/releases
+  version: ^0.2.4

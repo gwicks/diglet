@@ -1,0 +1,46 @@
+{
+    "foo": {
+        "bar": "baz"
+    },
+    "qux": {
+        "$ref": "#/foo",
+        "@doc": {
+            "resolve": false
+        }
+    },
+    "result": {
+        "raw": {
+            "$ref": "#/foo",
+            "@doc": {
+                "resolve": false
+            }
+        },
+        "resolved": {
+            "bar": "baz"
+        },
+        "rotten": {
+            "$ref": "#/foo",
+            "@doc": {
+                "resolve": false
+            }
+        }
+    },
+    "schema_pass": true,
+    "test": {
+        "raw": {
+            "$ref": "#/foo",
+            "@doc": {
+                "resolve": false
+            }
+        },
+        "resolved": {
+            "bar": "baz"
+        },
+        "rotten": {
+            "$ref": "#/foo",
+            "@doc": {
+                "resolve": false
+            }
+        }
+    }
+}

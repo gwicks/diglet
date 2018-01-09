@@ -24,7 +24,10 @@ func doCompile(filePath string, targetPath string) error {
 	resultJSON, _ := utils.ParseFileRefs(filePath, rootJSON)
 
 	if resultJSONObj, ok := resultJSON.(map[string]interface{}); ok {
-		finalJSON, _ := utils.ParseFileParent(filePath, resultJSONObj)
+		finalJSON, perr := utils.ParseFileParent(filePath, resultJSONObj)
+		if perr != nil {
+			log.Error(perr)
+		}
 
 		validatedJSON, verr := utils.ParseFileSchema(filePath, finalJSON)
 		if verr != nil {

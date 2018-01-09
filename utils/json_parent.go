@@ -1,5 +1,9 @@
 package utils
 
+import (
+	"github.com/imdario/mergo"
+)
+
 var parentParseJSON map[string]interface{}
 var outJSON map[string]interface{}
 
@@ -57,6 +61,12 @@ func resolveParents(basePath string, inputJSON interface{}, lastObject map[strin
 									} else {
 										if checkIfLocked(vk, lnames) {
 											rawJSON[vk] = vv
+										} else {
+											if baseKeys, bkok := vv.(map[string]interface{}); bkok {
+												if newKeys, nkok := rawJSON[vk].(map[string]interface{}); nkok {
+													mergo.Merge(&newKeys, baseKeys)
+												}
+											}
 										}
 									}
 								}
