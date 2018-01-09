@@ -217,6 +217,10 @@ func resolveRefs(basePath string, inputJSON interface{}, parentHolder map[string
 					} else {
 						resolveRefs(basePath, childObj, nil)
 					}
+				} else {
+					if childObj, bok := child.([]interface{}); bok {
+						resolveRefs(basePath, childObj, nil)
+					}
 				}
 			}
 		}

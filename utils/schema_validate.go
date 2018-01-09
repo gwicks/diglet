@@ -51,8 +51,8 @@ func doValidation(scmURI string, scmDat map[string]interface{}, targetObj interf
 
 func validateSchema(basePath string, inputJSON interface{}) error {
 	if rawJSON, rok := inputJSON.(map[string]interface{}); rok {
-		for k, v := range rawJSON {
-			logKV(k, v)
+		for _, v := range rawJSON {
+			// logKV(k, v)
 			switch v.(type) {
 			case map[string]interface{}:
 				if objData, ok := v.(map[string]interface{}); ok {

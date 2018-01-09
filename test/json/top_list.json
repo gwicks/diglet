@@ -1,6 +1,11 @@
 {
     "routeGroups": [
-        { 
+        [
+            {
+                "$ref": "./simple.json"
+            }
+        ],
+        {
             "$ref": "../testdeps/base.json" 
         }
     ]
