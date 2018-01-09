@@ -1,0 +1,11 @@
+{
+    "primary": "/static",
+    "buckets": [
+        { 
+            "name": "pre-content",
+            "modules": [
+                { "$ref": "./b/default.json" }
+            ]
+        }
+    ]
+}

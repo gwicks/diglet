@@ -1,7 +1,5 @@
 package utils
 
-import "fmt"
-
 var parentParseJSON map[string]interface{}
 var outJSON map[string]interface{}
 
@@ -21,65 +19,79 @@ func hasParent(jsonData map[string]interface{}) bool {
 	return false
 }
 
-func resolveParents(basePath string, rawJSON map[string]interface{}) {
-	fmt.Println("PARENT RESOLVE FOR")
-	fmt.Println(rawJSON)
-	// fmt.Println("WRITING TO OUTPUT OBJECT")
-	// fmt.Println(outJSON)
-	for k, v := range rawJSON {
-		if k == "@parent" {
-			if vp, ok := v.([]interface{}); ok {
-				fmt.Println("FOUND ARRAY OF PARENTS")
-				for _, it := range vp {
-					if itm, mok := it.(map[string]interface{}); mok {
-						if hasParent(itm) {
-							lastParent = rawJSON
-							resolveParents(basePath, itm)
-						} else {
-							fmt.Println("---------")
-							fmt.Println(itm)
-							fmt.Println("COPY INTO")
-							fmt.Println(lastParent)
-							delete(rawJSON, "@parent")
-							if lastParent != nil {
-								for vk, vv := range itm {
-									lastParent[vk] = vv
-								}
-								delete(lastParent, "@parent")
+func checkIfLocked(k string, lockedNames []interface{}) bool {
+	for _, i := range lockedNames {
+		if is, ok := i.(string); ok {
+			if k == is {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func getLockedNames(rawJSON map[string]interface{}) []interface{} {
+	if rawJSON["@lock_names"] != nil {
+		if vl, lok := rawJSON["@lock_names"].([]interface{}); lok {
+			return vl
+		}
+	}
+	return nil
+}
+
+func resolveParents(basePath string, inputJSON interface{}, lastObject map[string]interface{}) {
+	if rawJSON, rok := inputJSON.(map[string]interface{}); rok {
+		for k, v := range rawJSON {
+			if k == "@parent" {
+				if vp, ok := v.([]interface{}); ok {
+					for _, it := range vp {
+						if itm, mok := it.(map[string]interface{}); mok {
+							if hasParent(itm) {
+								resolveParents(basePath, itm, rawJSON)
 							} else {
+								lnames := getLockedNames(itm)
+								delete(rawJSON, "@parent")
 								for vk, vv := range itm {
+									if rawJSON[vk] == nil {
+										rawJSON[vk] = vv
+									} else {
+										if checkIfLocked(vk, lnames) {
+											rawJSON[vk] = vv
+										}
+									}
+								}
+								resolveParents(basePath, lastObject, nil)
+							}
+						}
+					}
+				} else {
+					if sp, sok := v.(map[string]interface{}); sok {
+						if hasParent(sp) {
+							resolveParents(basePath, sp, rawJSON)
+						} else {
+							lnames := getLockedNames(sp)
+							delete(rawJSON, "@parent")
+							for vk, vv := range sp {
+								if rawJSON[vk] == nil {
 									rawJSON[vk] = vv
+								} else {
+									if checkIfLocked(vk, lnames) {
+										rawJSON[vk] = vv
+									}
 								}
 							}
-
+							resolveParents(basePath, lastObject, nil)
 						}
 					}
 				}
 			} else {
-				if sp, sok := v.(map[string]interface{}); sok {
-					fmt.Println("FOUND SINGLE PARENT")
-					if hasParent(sp) {
-						lastParent = rawJSON
-						resolveParents(basePath, sp)
-					} else {
-						delete(rawJSON, "@parent")
-						if lastParent != nil {
-							for vk, vv := range sp {
-								lastParent[vk] = vv
-							}
-							delete(lastParent, "@parent")
-						} else {
-							for vk, vv := range sp {
-								rawJSON[vk] = vv
-							}
-						}
-					}
-				}
+				resolveParents(basePath, v, rawJSON)
 			}
-		} else {
-			fmt.Println("NO PARENT")
-			if targetObj, ok := v.(map[string]interface{}); ok {
-				resolveParents(basePath, targetObj)
+		}
+	} else {
+		if rawJSON, rok := inputJSON.([]interface{}); rok {
+			for _, itm := range rawJSON {
+				resolveParents(basePath, itm, nil)
 			}
 		}
 	}
@@ -90,7 +102,6 @@ func ParseFileParent(filePath string, inJSON map[string]interface{}) (map[string
 	outJSON = make(map[string]interface{})
 	parentParseJSON = inJSON
 
-	resolveParents(filePath, parentParseJSON)
-
+	resolveParents(filePath, parentParseJSON, nil)
 	return parentParseJSON, nil
 }

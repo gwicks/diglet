@@ -2,8 +2,10 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"reflect"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -24,7 +26,7 @@ func copyJSON(basePath string, filePath string, targetJSON *map[string]interface
 
 	rfd, rerr := ioutil.ReadFile(vsj)
 	if rerr != nil {
-		return "", rerr
+		return vsj, rerr
 	}
 
 	json.Unmarshal(rfd, &targetJSON)
@@ -91,7 +93,42 @@ func queryFile(filePath string, query string) interface{} {
 	return refVal
 }
 
-func resolveRefs(basePath string, inputJSON interface{}) error {
+func newCopyJson(basePath string, filePath string) (interface{}, string, error) {
+	var queryBase map[string]interface{}
+	vsj := filepath.Join(filepath.Dir(basePath), filePath)
+
+	rfd, rerr := ioutil.ReadFile(vsj)
+	if rerr != nil {
+		return nil, vsj, rerr
+	}
+
+	json.Unmarshal(rfd, &queryBase)
+	delete(queryBase, "$ref")
+
+	fmt.Println(queryBase)
+
+	return queryBase, vsj, nil
+}
+
+func logRefCall(bp string, ij interface{}) {
+	fmt.Print("RESOLVE WITH PATH: ")
+	fmt.Print(bp)
+	fmt.Print(" AND OBJ: ")
+	fmt.Print(ij)
+	fmt.Print(" (")
+	fmt.Print(reflect.TypeOf(ij))
+	fmt.Println(")")
+}
+
+func logKV(k string, v interface{}) {
+	fmt.Print("K: ")
+	fmt.Print(k)
+	fmt.Print(" V: ")
+	fmt.Print(v)
+	fmt.Println("")
+}
+
+func resolveRefs(basePath string, inputJSON interface{}, parentHolder map[string]interface{}) error {
 	if rawJSON, rok := inputJSON.(map[string]interface{}); rok {
 		for k, v := range rawJSON {
 			switch v.(type) {
@@ -102,7 +139,7 @@ func resolveRefs(basePath string, inputJSON interface{}) error {
 						if string(refPath[0]) == "#" {
 							rawJSON[k] = queryFile(basePath, refPath)
 
-							resolveRefs(basePath, rawJSON[k])
+							resolveRefs(basePath, rawJSON[k], nil)
 						} else {
 							pathSplit := strings.Split(filepath.Join(filepath.Dir(basePath), refPath), "#/")
 							if len(pathSplit) == 2 {
@@ -113,46 +150,33 @@ func resolveRefs(basePath string, inputJSON interface{}) error {
 								switch tobjt.(type) {
 								case map[string]interface{}:
 									currentPaths, copyErr := copyJSON(basePath, refPath, &rv)
+
 									if copyErr != nil {
 										log.Error(copyErr)
 										return copyErr
 									}
-									resolveRefs(currentPaths, rv)
+									resolveRefs(currentPaths, rv, nil)
 								case []interface{}:
 									rawJSON[k] = tobjt
-									resolveRefs(tp, tobjt)
+									resolveRefs(tp, tobjt, nil)
 								}
 
 							}
 						}
 					} else {
-						resolveRefs(basePath, rv)
+						resolveRefs(basePath, rv, nil)
 					}
 				}
 			case []interface{}:
 				if rv, ok := v.([]interface{}); ok {
-					for pidx, itm := range rv {
-						if itmv, iok := itm.(map[string]interface{}); iok {
-							tempParentKey = k
-							tempParentHolder = rawJSON
-							parentIdx = pidx
+					tempParentKey = k
 
-							resolveRefs(basePath, itmv)
-						} else {
-							if atmv, aok := itm.([]interface{}); aok {
-								for _, btm := range atmv {
-									if btmv, bok := btm.(map[string]interface{}); bok {
-										resolveRefs(basePath, btmv)
-									}
-								}
-							}
-						}
-					}
+					resolveRefs(basePath, rv, rawJSON)
 				}
 			case string:
 				refPath, ir := isRef(rawJSON)
 				if ir {
-					tobjt, _, _ := targetType(basePath, refPath)
+					tobjt, rp, _ := targetType(basePath, refPath)
 					switch tobjt.(type) {
 					case []interface{}:
 						if tobjarr, tok := tobjt.([]interface{}); tok {
@@ -160,35 +184,39 @@ func resolveRefs(basePath string, inputJSON interface{}) error {
 								if childMap, mok := child.(map[string]interface{}); mok {
 									refPathc, isr := isRef(childMap)
 									if isr {
-										currentPath, copyErr := copyJSON(basePath, refPathc, &childMap)
-
+										currentPath, copyErr := copyJSON(rp, refPathc, &childMap)
 										if copyErr != nil {
 											log.Error(copyErr)
 											return copyErr
 										}
 										tobjarr[idx] = childMap
-										if pd, pok := tempParentHolder[tempParentKey].([]interface{}); pok {
-											pd[parentIdx] = tobjarr
-											resolveRefs(currentPath, childMap)
+										if parentHolder != nil {
+											if pd, pok := parentHolder[tempParentKey].([]interface{}); pok {
+												pd[parentIdx] = tobjarr
+												resolveRefs(currentPath, childMap, nil)
+											}
 										}
+
 									} else {
-										if pd, pok := tempParentHolder[tempParentKey].([]interface{}); pok {
-											pd[parentIdx] = tobjarr
-										} else {
-											tempParentHolder[tempParentKey] = tobjarr
+										if parentHolder != nil {
+											if pd, pok := parentHolder[tempParentKey].([]interface{}); pok {
+												pd[parentIdx] = tobjarr
+												resolveRefs(currentPath, childMap, nil)
+											} else {
+												parentHolder[tempParentKey] = tobjarr
+											}
 										}
 									}
 								}
 							}
 						}
-
 					case map[string]interface{}:
 						currentPaths, copyErr := copyJSON(basePath, refPath, &rawJSON)
 						if copyErr != nil {
 							log.Error(copyErr)
 							return copyErr
 						}
-						resolveRefs(currentPaths, rawJSON)
+						resolveRefs(currentPaths, rawJSON, nil)
 					}
 
 				}
@@ -202,43 +230,26 @@ func resolveRefs(basePath string, inputJSON interface{}) error {
 					if ir {
 						vd, vp, _ := targetType(basePath, refPath)
 						rawJSON[cidx] = vd
-						resolveRefs(vp, vd)
+						resolveRefs(vp, vd, nil)
+					} else {
+						resolveRefs(basePath, childObj, nil)
 					}
 				}
 			}
 		}
 	}
-
 	return nil
 }
 
 // ParseFileRefs Dummy
 func ParseFileRefs(filePath string, inJSON interface{}) (interface{}, error) {
 
-	switch inJSON.(type) {
-	case map[string]interface{}:
-		if inObj, ok := inJSON.(map[string]interface{}); ok {
-			parentJSON = inObj
+	if inObj, ok := inJSON.(map[string]interface{}); ok {
+		parentJSON = inObj
 
-			resolveRefs(filePath, parentJSON)
+		resolveRefs(filePath, parentJSON, nil)
 
-			return parentJSON, nil
-		}
-	case []interface{}:
-		if inObj, ok := inJSON.([]interface{}); ok {
-			parentArr = inObj
-			for _, child := range inObj {
-				if childObj, bok := child.(map[string]interface{}); bok {
-					parentJSON = childObj
-
-					resolveRefs(filePath, parentJSON)
-
-					return parentArr, nil
-				}
-
-			}
-
-		}
+		return parentJSON, nil
 	}
 
 	return nil, nil

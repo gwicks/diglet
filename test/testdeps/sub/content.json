@@ -1,0 +1,11 @@
+{
+    "primary": "/content",
+    "buckets": [
+        { 
+            "name": "post-content",
+            "modules": [
+                { "$ref": "./a/default.json" }
+            ]
+        }
+    ]
+}

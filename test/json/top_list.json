@@ -1,5 +1,8 @@
-[
-    {
-        "$ref": "./simple.json"
-    }
-]
+{
+    "routeGroups": [
+        { 
+            "$ref": "../testdeps/base.json" 
+        }
+    ]
+}
+
