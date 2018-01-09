@@ -21,30 +21,33 @@ func doCompile(filePath string, targetPath string) error {
 
 	json.Unmarshal(fd, &rootJSON)
 
-	resultJSON, _ := utils.ParseFileRefs(filePath, rootJSON)
+	resultJSON, rerr := utils.ParseFileRefs(filePath, rootJSON)
+
+	if rerr != nil {
+		log.Error(rerr)
+		return rerr
+	}
 
 	if resultJSONObj, ok := resultJSON.(map[string]interface{}); ok {
 		finalJSON, perr := utils.ParseFileParent(filePath, resultJSONObj)
 		if perr != nil {
 			log.Error(perr)
+			return perr
 		}
 
 		validatedJSON, verr := utils.ParseFileSchema(filePath, finalJSON)
 		if verr != nil {
 			log.Error(verr)
-		} else {
-			resultStr, _ := json.MarshalIndent(validatedJSON, "", "    ")
-
-			if len(targetPath) > 0 {
-				ioutil.WriteFile(targetPath, resultStr, 0644)
-			} else {
-				fmt.Println(string(resultStr))
-			}
+			return verr
 		}
-	} else {
-		resultStr, _ := json.MarshalIndent(resultJSON, "", "    ")
 
-		fmt.Println(string(resultStr))
+		resultStr, _ := json.MarshalIndent(validatedJSON, "", "    ")
+
+		if len(targetPath) > 0 {
+			ioutil.WriteFile(targetPath, resultStr, 0644)
+		} else {
+			fmt.Println(string(resultStr))
+		}
 	}
 	return nil
 }
