@@ -1,6 +1,9 @@
 {
-    "c": "d",
-    "c_ref": { 
-        "d": {"$ref": "#/c"}
-    }
+    "@schemas": {
+        "nested_schema": {
+            "$ref": "../schema/nested_schema.json"
+        }
+    },
+    "foo": "baz",
+    "bar": {"$ref": "#/foo"}
 }

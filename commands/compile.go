@@ -30,7 +30,6 @@ func compileAction(c *cli.Context) error {
 			finalJSON, _ := utils.ParseFileParent(cmdArgs[0], resultJSONObj)
 
 			validatedJSON, verr := utils.ParseFileSchema(cmdArgs[0], finalJSON)
-
 			if verr != nil {
 				log.Error(verr)
 			} else {
