@@ -29,16 +29,20 @@ func compileAction(c *cli.Context) error {
 		if resultJSONObj, ok := resultJSON.(map[string]interface{}); ok {
 			finalJSON, _ := utils.ParseFileParent(cmdArgs[0], resultJSONObj)
 
-			resultStr, _ := json.MarshalIndent(finalJSON, "", "    ")
+			validatedJSON, verr := utils.ParseFileSchema(cmdArgs[0], finalJSON)
 
-			fmt.Println(string(resultStr))
+			if verr != nil {
+				log.Error(verr)
+			} else {
+				resultStr, _ := json.MarshalIndent(validatedJSON, "", "    ")
+
+				fmt.Println(string(resultStr))
+			}
 		} else {
 			resultStr, _ := json.MarshalIndent(resultJSON, "", "    ")
 
 			fmt.Println(string(resultStr))
 		}
-
-		// validatedJSON, _ := utils.ParseFileSchema(cmdArgs[0], finalJSON)
 
 	} else {
 		fmt.Println("Must specify a JSON file to compile")

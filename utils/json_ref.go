@@ -93,23 +93,6 @@ func queryFile(filePath string, query string) interface{} {
 	return refVal
 }
 
-func newCopyJson(basePath string, filePath string) (interface{}, string, error) {
-	var queryBase map[string]interface{}
-	vsj := filepath.Join(filepath.Dir(basePath), filePath)
-
-	rfd, rerr := ioutil.ReadFile(vsj)
-	if rerr != nil {
-		return nil, vsj, rerr
-	}
-
-	json.Unmarshal(rfd, &queryBase)
-	delete(queryBase, "$ref")
-
-	fmt.Println(queryBase)
-
-	return queryBase, vsj, nil
-}
-
 func logRefCall(bp string, ij interface{}) {
 	fmt.Print("RESOLVE WITH PATH: ")
 	fmt.Print(bp)
