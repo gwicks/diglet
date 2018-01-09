@@ -1,8 +1,8 @@
 {
-    "primary": "/static",
+    "uri": "/static",
     "buckets": [
         { 
-            "name": "pre-content",
+            "name": "head",
             "modules": [
                 { "$ref": "./b/default.json" }
             ]

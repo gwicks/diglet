@@ -1,8 +1,8 @@
 {
-    "primary": "/content",
+    "uri": "/content",
     "buckets": [
         { 
-            "name": "post-content",
+            "name": "base",
             "modules": [
                 { "$ref": "./a/default.json" }
             ]
