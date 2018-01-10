@@ -3,12 +3,15 @@ package utils
 import (
 	"encoding/json"
 	"strings"
+	"sync"
 
 	"github.com/santhosh-tekuri/jsonschema"
 )
 
 var rootJSON map[string]interface{}
 var validErr error
+
+var schemaMutex sync.Mutex
 
 func schemaForObject(targetObj map[string]interface{}) (string, interface{}) {
 	var retURI string
@@ -28,9 +31,10 @@ func schemaForObject(targetObj map[string]interface{}) (string, interface{}) {
 
 func doValidation(scmURI string, scmDat map[string]interface{}, targetObj interface{}) error {
 	url := scmURI + ".json"
+	schemaMutex.Lock()
 	marshaledSchema, _ := json.Marshal(scmDat)
-
 	marshaledObj, _ := json.Marshal(targetObj)
+	schemaMutex.Unlock()
 
 	compiler := jsonschema.NewCompiler()
 	compiler.Draft = jsonschema.Draft6

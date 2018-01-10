@@ -15,7 +15,6 @@ func batchAction(c *cli.Context) error {
 	if len(cmdArgs) > 0 {
 		inFile, err := os.Open(cmdArgs[0])
 		if err != nil {
-			fmt.Println("ERROR ON BATCH")
 			log.Error(err)
 			return err
 		}

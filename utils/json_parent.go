@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"sync"
+
 	"github.com/imdario/mergo"
 )
 
@@ -9,6 +11,8 @@ var outJSON map[string]interface{}
 
 var lastParent map[string]interface{}
 var currentPathParent string
+
+var parentMutex sync.Mutex
 
 func hasParent(jsonData map[string]interface{}) bool {
 	if pa, ok := jsonData["@parent"].([]interface{}); ok {
@@ -57,14 +61,21 @@ func resolveParents(basePath string, inputJSON interface{}, lastObject map[strin
 								delete(rawJSON, "@parent")
 								for vk, vv := range itm {
 									if rawJSON[vk] == nil {
+										parentMutex.Lock()
 										rawJSON[vk] = vv
+										parentMutex.Unlock()
 									} else {
 										if checkIfLocked(vk, lnames) {
+											parentMutex.Lock()
 											rawJSON[vk] = vv
+											parentMutex.Unlock()
 										} else {
 											if baseKeys, bkok := vv.(map[string]interface{}); bkok {
 												if newKeys, nkok := rawJSON[vk].(map[string]interface{}); nkok {
+													parentMutex.Lock()
 													mergo.Merge(&newKeys, baseKeys)
+													parentMutex.Unlock()
+													resolveParents(basePath, newKeys, nil)
 												}
 											}
 										}
