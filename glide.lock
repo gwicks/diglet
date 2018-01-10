@@ -1,6 +1,8 @@
-hash: 61bb28762abd15865873f7e30d81e532acc317ec7b7ebc122854dc40787b93e4
-updated: 2018-01-09T15:04:52.642225579-05:00
+hash: f4ada06d521f2669560b23cd16aaa1c11b6f5617812043b1b4adb4a7b7bbe123
+updated: 2018-01-10T13:28:20.296989638-05:00
 imports:
+- name: github.com/dc0d/workerpool
+  version: 3d2f3651d7bd305d925aaae58c9409d8b90c265a
 - name: github.com/imdario/mergo
   version: 7fe0c75c13abdee74b09fcacef5ea1c6bba6a874
   subpackages:
