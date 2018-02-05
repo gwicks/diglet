@@ -1,10 +1,10 @@
-hash: f4ada06d521f2669560b23cd16aaa1c11b6f5617812043b1b4adb4a7b7bbe123
-updated: 2018-01-10T13:28:20.296989638-05:00
+hash: c017b7e4df41311a3eca1e7a0eb1b247fb3384bc9c9f4b9d11cfc6e0e64ed343
+updated: 2018-02-05T15:05:35.069567608-05:00
 imports:
 - name: github.com/dc0d/workerpool
   version: 3d2f3651d7bd305d925aaae58c9409d8b90c265a
 - name: github.com/imdario/mergo
-  version: 7fe0c75c13abdee74b09fcacef5ea1c6bba6a874
+  version: 163f41321a19dd09362d4c63cc2489db2015f1f4
   subpackages:
   - releases
 - name: github.com/santhosh-tekuri/jsonschema
@@ -17,9 +17,9 @@ imports:
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: github.com/xeipuuv/gojsonpointer
-  version: 6fe8760cad3569743d51ddbb243b26f8456742dc
+  version: 4e3ac2762d5f479393488629ee9370b50873b3a6
 - name: github.com/xeipuuv/gojsonreference
-  version: e02fc20de94c78484cd5ffb007f8af96be030a45
+  version: bd5ef7bd5415a7ac448318e64f11a24cd21e594b
 - name: golang.org/x/crypto
   version: 94eea52f7b742c7cbe0b03b22f0c4c8631ece122
   subpackages:

@@ -1,4 +1,4 @@
-package: github.com/gwicks/diglett
+package: github.com/gwicks/diglet
 import:
 - package: github.com/urfave/cli
   version: ^1.19.0
