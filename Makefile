@@ -3,7 +3,7 @@ INSTALL_PATH=$(GOPATH)bin
 
 install: build
 	@mkdir -p $(INSTALL_PATH)
-	@cp lincoln $(INSTALL_PATH)/lincoln
+	@cp diglet $(INSTALL_PATH)/diglet
 
 build:
 	@go build

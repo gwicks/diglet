@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/gwicks/lincoln/utils"
+	"github.com/gwicks/diglet/utils"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )

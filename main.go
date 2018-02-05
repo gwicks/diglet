@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/gwicks/lincoln/commands"
+	"github.com/gwicks/diglet/commands"
 	"github.com/urfave/cli"
 )
 
@@ -18,7 +18,7 @@ func main() {
 
 func makeGlobalApp() *cli.App {
 	app := cli.NewApp()
-	app.Name = "lincoln"
+	app.Name = "diglet"
 	// app.Before = config.Setup
 	app.Usage = "JSON Compiler and Schema Validator"
 	// app.Action = run
