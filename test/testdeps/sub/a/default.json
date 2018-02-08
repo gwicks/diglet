@@ -1,7 +1,7 @@
 {
-    "name": "title",
-    "slots": {
-        "pre": [ "test_one" ],
-        "post": []
+    "name": "Module A",
+    "something": {
+        "other": [ "default_one" ],
+        "test": [ "post_default" ]
     }
 }

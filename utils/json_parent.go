@@ -3,7 +3,7 @@ package utils
 import (
 	"sync"
 
-	"github.com/imdario/mergo"
+	"github.com/gwicks/mergo"
 )
 
 var parentParseJSON map[string]interface{}
@@ -14,17 +14,17 @@ var currentPathParent string
 
 var parentMutex sync.Mutex
 
-func hasParent(jsonData map[string]interface{}) bool {
+func hasParent(jsonData map[string]interface{}) (bool, interface{}) {
 	if pa, ok := jsonData["@parent"].([]interface{}); ok {
 		if len(pa) > 0 {
-			return true
+			return true, pa
 		}
 	} else {
-		if _, sok := jsonData["@parent"].(map[string]interface{}); sok {
-			return true
+		if pm, sok := jsonData["@parent"].(map[string]interface{}); sok {
+			return true, pm
 		}
 	}
-	return false
+	return false, nil
 }
 
 func checkIfLocked(k string, lockedNames []interface{}) bool {
@@ -47,66 +47,75 @@ func getLockedNames(rawJSON map[string]interface{}) []interface{} {
 	return nil
 }
 
+func saveLockObj(names []interface{}, target map[string]interface{}) map[string]interface{} {
+	var retObj map[string]interface{}
+
+	retObj = make(map[string]interface{})
+
+	for _, name := range names {
+		if ns, lok := name.(string); lok {
+			retObj[ns] = target[ns]
+		}
+	}
+
+	return retObj
+}
+
+func mergeObjects(dest map[string]interface{}, src map[string]interface{}) {
+	lnames := getLockedNames(src)
+	restoreObject := saveLockObj(lnames, src)
+	if len(lnames) > 0 {
+		mergo.Merge(&dest, src)
+		mergo.Merge(&dest, restoreObject, mergo.WithOverride)
+	} else {
+		mergo.Merge(&dest, src)
+	}
+}
+
 func resolveParents(basePath string, inputJSON interface{}, lastObject map[string]interface{}) {
 	if rawJSON, rok := inputJSON.(map[string]interface{}); rok {
-		for k, v := range rawJSON {
-			if k == "@parent" {
-				if vp, ok := v.([]interface{}); ok {
-					for _, it := range vp {
-						if itm, mok := it.(map[string]interface{}); mok {
-							if hasParent(itm) {
-								resolveParents(basePath, itm, rawJSON)
-							} else {
-								lnames := getLockedNames(itm)
-								delete(rawJSON, "@parent")
-								for vk, vv := range itm {
-									if rawJSON[vk] == nil {
-										parentMutex.Lock()
-										rawJSON[vk] = vv
-										parentMutex.Unlock()
-									} else {
-										if checkIfLocked(vk, lnames) {
-											parentMutex.Lock()
-											rawJSON[vk] = vv
-											parentMutex.Unlock()
-										} else {
-											if baseKeys, bkok := vv.(map[string]interface{}); bkok {
-												if newKeys, nkok := rawJSON[vk].(map[string]interface{}); nkok {
-													parentMutex.Lock()
-													mergo.Merge(&newKeys, baseKeys)
-													parentMutex.Unlock()
-													resolveParents(basePath, newKeys, nil)
-												}
-											}
-										}
-									}
-								}
-								resolveParents(basePath, lastObject, nil)
-							}
-						}
+		rhp, pd := hasParent(rawJSON)
+		if rhp {
+			switch pd.(type) {
+			case []interface{}:
+				if pdarr, ok := pd.([]interface{}); ok {
+					for i := len(pdarr)/2 - 1; i >= 0; i-- {
+						opp := len(pdarr) - 1 - i
+						pdarr[i], pdarr[opp] = pdarr[opp], pdarr[i]
 					}
-				} else {
-					if sp, sok := v.(map[string]interface{}); sok {
-						if hasParent(sp) {
-							resolveParents(basePath, sp, rawJSON)
-						} else {
-							lnames := getLockedNames(sp)
-							delete(rawJSON, "@parent")
-							for vk, vv := range sp {
-								if rawJSON[vk] == nil {
-									rawJSON[vk] = vv
-								} else {
-									if checkIfLocked(vk, lnames) {
-										rawJSON[vk] = vv
-									}
-								}
+					for _, parentItem := range pdarr {
+						delete(rawJSON, "@parent")
+						if pdmap, pok := parentItem.(map[string]interface{}); pok {
+							php, _ := hasParent(pdmap)
+							if php {
+								resolveParents(basePath, pdmap, nil)
+								mergeObjects(rawJSON, pdmap)
+							} else {
+								mergeObjects(rawJSON, pdmap)
+								resolveParents(basePath, pdmap, nil)
 							}
-							resolveParents(basePath, lastObject, nil)
 						}
 					}
 				}
-			} else {
-				resolveParents(basePath, v, rawJSON)
+			case map[string]interface{}:
+				if pdobj, ok := pd.(map[string]interface{}); ok {
+					delete(rawJSON, "@parent")
+					php, _ := hasParent(pdobj)
+					if php {
+						resolveParents(basePath, pdobj, nil)
+						mergeObjects(rawJSON, pdobj)
+					} else {
+						mergeObjects(rawJSON, pdobj)
+						resolveParents(basePath, pdobj, nil)
+					}
+				}
+			}
+			for _, v := range rawJSON {
+				resolveParents(basePath, v, nil)
+			}
+		} else {
+			for _, v := range rawJSON {
+				resolveParents(basePath, v, nil)
 			}
 		}
 	} else {

@@ -1,0 +1,13 @@
+{
+    "@parent": [
+        {
+            "$ref": "./default.json"
+        }
+    ],
+    "name": "Variant A",
+    "something": {
+        "other": [
+            "variant_one"
+        ]
+    }
+}

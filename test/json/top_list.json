@@ -1,16 +1,11 @@
 {
-    "routeGroups": [
-        [
-            {
-                "$ref": "./simple.json"
-            }
-        ],
+    "@parent": [
         {
-            "$ref": "../testdeps/base.json" 
+            "$ref": "./parent.json"
         }
     ],
     "routes": {
-        "front home": { "$ref": "../testdeps/sub/a/default.json" }
+        "front home": { "$ref": "../testdeps/sub/a/variant.json" }
     }
 }
 
