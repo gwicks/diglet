@@ -12,5 +12,3 @@ import:
   version: master
 - package: github.com/gwicks/mergo
   version: master
-- package: github.com/dc0d/workerpool
-  version: master

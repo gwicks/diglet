@@ -9,7 +9,7 @@ import (
 	"strings"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/gwicks/mergo"
 	jsonref "github.com/xeipuuv/gojsonreference"
 )
 
@@ -22,63 +22,108 @@ var currentPath string
 
 var refMutex sync.Mutex
 
-func copyJSON(basePath string, filePath string, targetJSON *map[string]interface{}) (string, error) {
-	vsj := filepath.Join(filepath.Dir(basePath), filePath)
-
-	rfd, rerr := ioutil.ReadFile(vsj)
-	if rerr != nil {
-		return vsj, rerr
-	}
-
-	json.Unmarshal(rfd, &targetJSON)
-	delete(*targetJSON, "$ref")
-
-	return vsj, nil
-}
-
-func targetType(basePath string, filePath string) (interface{}, string, error) {
-	var tempJSON interface{}
-	vsj := filepath.Join(filepath.Dir(basePath), filePath)
-
-	rfd, rerr := ioutil.ReadFile(vsj)
-	if rerr != nil {
-		return nil, vsj, rerr
-	}
-
-	json.Unmarshal(rfd, &tempJSON)
-
-	return tempJSON, vsj, nil
-}
-
-func copyExtRef(basePath string, filePath string) (interface{}, error) {
-	var tempJSON interface{}
-
-	vsj := filepath.Join(filepath.Dir(basePath), filePath)
-	pathSplit := strings.Split(vsj, "#/")
-
-	rfd, rerr := ioutil.ReadFile(pathSplit[0])
-
-	if rerr != nil {
-		return nil, rerr
-	}
-
-	qk := "#/" + pathSplit[1]
-
-	json.Unmarshal(rfd, &tempJSON)
-
-	jref, _ := jsonref.NewJsonReference(qk)
-	refVal, _, _ := jref.GetPointer().Get(tempJSON)
-
-	return refVal, nil
-}
-
-func isRef(refJSON map[string]interface{}) (string, bool) {
+func getRef(refJSON map[string]interface{}) (interface{}, bool) {
 	if len(refJSON) == 1 {
-		if rk, rok := refJSON["$ref"].(string); rok {
-			return rk, true
+		if _, rok := refJSON["$ref"].(string); rok {
+			return refJSON, true
 		}
 	}
 	return "", false
+}
+
+func refType(refPath string) int {
+	if refPath[0] == '#' {
+		return 2
+	} else if strings.Index(refPath, "#/") != -1 {
+		return 1
+	} else {
+		return 0
+	}
+}
+
+func getResolve(refObj interface{}) bool {
+	if refObjMap, refOk := refObj.(map[string]interface{}); refOk {
+		if docDir, dok := refObjMap["@doc"].(map[string]interface{}); dok {
+			if docResolve, rok := docDir["resolve"].(bool); rok {
+				return docResolve
+			}
+		}
+	}
+	return true
+}
+
+func fetchRef(basePath string, refJSON map[string]interface{}, parentHolder interface{}, parentKey string, parentIdx int) string {
+	if refStr, ok := refJSON["$ref"].(string); ok {
+		var holderJSON interface{}
+
+		refT := refType(refStr)
+
+		switch refT {
+		case 0:
+			vsj := filepath.Join(filepath.Dir(basePath), refStr)
+
+			rfd, _ := ioutil.ReadFile(vsj)
+
+			json.Unmarshal(rfd, &holderJSON)
+
+			if getResolve(holderJSON) {
+				resolveRefs(vsj, holderJSON, nil, "", -1)
+			}
+
+			delete(refJSON, "$ref")
+
+			if parentHolderObj, ok := parentHolder.(map[string]interface{}); ok {
+				parentHolderObj[parentKey] = holderJSON
+			} else {
+				if parentHolderArr, ok := parentHolder.([]interface{}); ok {
+					parentHolderArr[parentIdx] = holderJSON
+				} else {
+					mergo.Merge(&refJSON, holderJSON, mergo.WithOverride)
+				}
+			}
+
+			return vsj
+		case 1:
+			pathSplit := strings.Split(filepath.Join(filepath.Dir(basePath), refStr), "#/")
+			if len(pathSplit) == 2 {
+				qk := "#/" + pathSplit[1]
+
+				holderJSON = queryFile(pathSplit[0], qk)
+
+				if getResolve(holderJSON) {
+					resolveRefs(pathSplit[0], holderJSON, nil, "", -1)
+				}
+
+				if parentHolderObj, ok := parentHolder.(map[string]interface{}); ok {
+					parentHolderObj[parentKey] = holderJSON
+				} else {
+					if parentHolderArr, ok := parentHolder.([]interface{}); ok {
+						parentHolderArr[parentIdx] = holderJSON
+					} else {
+						mergo.Merge(&refJSON, holderJSON, mergo.WithOverride)
+					}
+				}
+			}
+
+		case 2:
+			holderJSON = queryFile(basePath, refStr)
+
+			if getResolve(holderJSON) {
+				resolveRefs(basePath, holderJSON, nil, "", -1)
+			}
+
+			if parentHolderObj, ok := parentHolder.(map[string]interface{}); ok {
+				parentHolderObj[parentKey] = holderJSON
+			} else {
+				if parentHolderArr, ok := parentHolder.([]interface{}); ok {
+					parentHolderArr[parentIdx] = holderJSON
+				} else {
+					mergo.Merge(&refJSON, holderJSON, mergo.WithOverride)
+				}
+			}
+		}
+	}
+	return basePath
 }
 
 func queryFile(filePath string, query string) interface{} {
@@ -112,121 +157,25 @@ func logKV(k string, v interface{}) {
 	fmt.Println("")
 }
 
-func resolveRefs(basePath string, inputJSON interface{}, parentHolder map[string]interface{}, parentKey string) error {
+func resolveRefs(basePath string, inputJSON interface{}, parentHolder interface{}, parentKey string, parentIdx int) error {
 	if rawJSON, rok := inputJSON.(map[string]interface{}); rok {
-		for k, v := range rawJSON {
-			switch v.(type) {
-			case map[string]interface{}:
-				if rv, ok := v.(map[string]interface{}); ok {
-					refPath, ir := isRef(rv)
-					if ir {
-						if string(refPath[0]) == "#" {
-							refMutex.Lock()
-							rawJSON[k] = queryFile(basePath, refPath)
-							refMutex.Unlock()
-
-							resolveRefs(basePath, rawJSON[k], nil, "")
-						} else {
-							pathSplit := strings.Split(filepath.Join(filepath.Dir(basePath), refPath), "#/")
-							if len(pathSplit) == 2 {
-								refMutex.Lock()
-								nv, _ := copyExtRef(basePath, refPath)
-								rawJSON[k] = nv
-								refMutex.Unlock()
-							} else {
-								tobjt, tp, _ := targetType(basePath, refPath)
-								switch tobjt.(type) {
-								case map[string]interface{}:
-									refMutex.Lock()
-									currentPaths, copyErr := copyJSON(basePath, refPath, &rv)
-									refMutex.Unlock()
-									if copyErr != nil {
-										log.Error(copyErr)
-										return copyErr
-									}
-									resolveRefs(currentPaths, rv, nil, "")
-								case []interface{}:
-									rawJSON[k] = tobjt
-									resolveRefs(tp, tobjt, nil, "")
-								}
-
-							}
-						}
-					} else {
-						resolveRefs(basePath, rv, nil, "")
-					}
+		refP, isr := getRef(rawJSON)
+		if isr {
+			if refPMap, pok := refP.(map[string]interface{}); pok {
+				fetchRef(basePath, refPMap, parentHolder, parentKey, parentIdx)
+			}
+		} else {
+			for k, v := range rawJSON {
+				if getResolve(rawJSON) {
+					resolveRefs(basePath, v, rawJSON, k, parentIdx)
 				}
-			case []interface{}:
-				if rv, ok := v.([]interface{}); ok {
 
-					resolveRefs(basePath, rv, rawJSON, k)
-				}
-			case string:
-				refPath, ir := isRef(rawJSON)
-				if ir {
-					tobjt, rp, _ := targetType(basePath, refPath)
-					switch tobjt.(type) {
-					case []interface{}:
-						if tobjarr, tok := tobjt.([]interface{}); tok {
-							for idx, child := range tobjarr {
-								if childMap, mok := child.(map[string]interface{}); mok {
-									refPathc, isr := isRef(childMap)
-									if isr {
-										currentPath, copyErr := copyJSON(rp, refPathc, &childMap)
-										if copyErr != nil {
-											log.Error(copyErr)
-											return copyErr
-										}
-										tobjarr[idx] = childMap
-										if parentHolder != nil {
-											if pd, pok := parentHolder[parentKey].([]interface{}); pok {
-												pd[parentIdx] = tobjarr
-												resolveRefs(currentPath, childMap, nil, "")
-											}
-										}
-
-									} else {
-										if parentHolder != nil {
-											if pd, pok := parentHolder[parentKey].([]interface{}); pok {
-												pd[parentIdx] = tobjarr
-												resolveRefs(currentPath, childMap, nil, "")
-											} else {
-												parentHolder[parentKey] = tobjarr
-											}
-										}
-									}
-								}
-							}
-						}
-					case map[string]interface{}:
-						currentPaths, copyErr := copyJSON(basePath, refPath, &rawJSON)
-						if copyErr != nil {
-							log.Error(copyErr)
-							return copyErr
-						}
-						resolveRefs(currentPaths, rawJSON, nil, "")
-					}
-
-				}
 			}
 		}
 	} else {
-		if rawJSON, rok := inputJSON.([]interface{}); rok {
-			for cidx, child := range rawJSON {
-				if childObj, bok := child.(map[string]interface{}); bok {
-					refPath, ir := isRef(childObj)
-					if ir {
-						vd, vp, _ := targetType(basePath, refPath)
-						rawJSON[cidx] = vd
-						resolveRefs(vp, vd, nil, "")
-					} else {
-						resolveRefs(basePath, childObj, nil, "")
-					}
-				} else {
-					if childObj, bok := child.([]interface{}); bok {
-						resolveRefs(basePath, childObj, nil, "")
-					}
-				}
+		if rawJSON, arok := inputJSON.([]interface{}); arok {
+			for pidx, obj := range rawJSON {
+				resolveRefs(basePath, obj, rawJSON, "", pidx)
 			}
 		}
 	}
@@ -239,7 +188,7 @@ func ParseFileRefs(filePath string, inJSON interface{}) (interface{}, error) {
 	if inObj, ok := inJSON.(map[string]interface{}); ok {
 		parentJSON = inObj
 
-		resolveRefs(filePath, parentJSON, nil, "")
+		resolveRefs(filePath, parentJSON, nil, "", -1)
 
 		return parentJSON, nil
 	}
