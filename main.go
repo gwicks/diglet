@@ -1,4 +1,4 @@
-package main
+package diglet
 
 import (
 	"os"
