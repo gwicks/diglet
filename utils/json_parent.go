@@ -127,7 +127,7 @@ func resolveParents(basePath string, inputJSON interface{}, lastObject map[strin
 	}
 }
 
-// ParseFileParent Dummy
+// ParseFileParent Parses out parenting for a given file, with children overriding values in a parent, unless they are explicitly locked.
 func ParseFileParent(filePath string, inJSON map[string]interface{}) (map[string]interface{}, error) {
 	outJSON = make(map[string]interface{})
 	parentParseJSON = inJSON

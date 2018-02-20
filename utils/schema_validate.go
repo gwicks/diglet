@@ -95,7 +95,7 @@ func validateSchema(basePath string, inputJSON interface{}) error {
 	return nil
 }
 
-// ParseFileSchema Dummy
+// ParseFileSchema Handles schema validation to the JSON Schema Draft 6 specification, returns any validations errors.
 func ParseFileSchema(filePath string, inJSON map[string]interface{}) (map[string]interface{}, error) {
 	validErr = nil
 	rootJSON = inJSON

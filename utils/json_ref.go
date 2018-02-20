@@ -7,30 +7,24 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
-	"sync"
 
 	"github.com/gwicks/mergo"
 	jsonref "github.com/xeipuuv/gojsonreference"
 )
 
 var parentJSON map[string]interface{}
-var parentArr []interface{}
 
-var parentIdx int
-
-var currentPath string
-
-var refMutex sync.Mutex
-
+// Fetches the reference from the given object, if any, and whether one was found.
 func getRef(refJSON map[string]interface{}) (interface{}, bool) {
 	if len(refJSON) == 1 {
 		if _, rok := refJSON["$ref"].(string); rok {
 			return refJSON, true
 		}
 	}
-	return "", false
+	return nil, false
 }
 
+// Gets the reference type: 0 - Ref to external JSON; 1 - Ref to an in object in external JSON; 2 - Ref to an object in the current JSON data
 func refType(refPath string) int {
 	if refPath[0] == '#' {
 		return 2
@@ -41,6 +35,7 @@ func refType(refPath string) int {
 	}
 }
 
+// Determine whether or not to continue resolving an object based on the flag
 func getResolve(refObj interface{}) bool {
 	if refObjMap, refOk := refObj.(map[string]interface{}); refOk {
 		if docDir, dok := refObjMap["@doc"].(map[string]interface{}); dok {
@@ -52,12 +47,14 @@ func getResolve(refObj interface{}) bool {
 	return true
 }
 
+// Retrieve a reference and replace the reference object with whatever is retrieved
 func fetchRef(basePath string, refJSON map[string]interface{}, parentHolder interface{}, parentKey string, parentIdx int) string {
 	if refStr, ok := refJSON["$ref"].(string); ok {
 		var holderJSON interface{}
 
 		refT := refType(refStr)
 
+		// Since the object may change in type from map to array, it cannot be set in place, rather, it has to be set by modifying the parent.
 		switch refT {
 		case 0:
 			vsj := filepath.Join(filepath.Dir(basePath), refStr)
@@ -126,6 +123,7 @@ func fetchRef(basePath string, refJSON map[string]interface{}, parentHolder inte
 	return basePath
 }
 
+// Handles querying the local file and getting the appropriate JSON object
 func queryFile(filePath string, query string) interface{} {
 	var queryBase map[string]interface{}
 
@@ -157,6 +155,7 @@ func logKV(k string, v interface{}) {
 	fmt.Println("")
 }
 
+// Main iteration and recursion loop for the reference parser
 func resolveRefs(basePath string, inputJSON interface{}, parentHolder interface{}, parentKey string, parentIdx int) error {
 	if rawJSON, rok := inputJSON.(map[string]interface{}); rok {
 		refP, isr := getRef(rawJSON)
@@ -169,7 +168,6 @@ func resolveRefs(basePath string, inputJSON interface{}, parentHolder interface{
 				if getResolve(rawJSON) {
 					resolveRefs(basePath, v, rawJSON, k, parentIdx)
 				}
-
 			}
 		}
 	} else {
@@ -182,7 +180,7 @@ func resolveRefs(basePath string, inputJSON interface{}, parentHolder interface{
 	return nil
 }
 
-// ParseFileRefs Dummy
+// ParseFileRefs Parses the $ref tags within a JSON file and resolves them to whatever the reference
 func ParseFileRefs(filePath string, inJSON interface{}) (interface{}, error) {
 
 	if inObj, ok := inJSON.(map[string]interface{}); ok {
