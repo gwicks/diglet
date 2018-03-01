@@ -1,5 +1,10 @@
 {
-    "just_another_key": "just_a_value",
-
-    "test_two": {"$ref": "./extract_value.json#/just_a_key"}
+    "test": {
+        "just_a_key": {"$ref": "./extract_value.json#/just_a_key"},
+        "just_another_key": "just_another_value"
+    },
+    "result": {
+        "just_a_key": "just_a_value",
+        "just_another_key": "just_another_value"
+    }
 }

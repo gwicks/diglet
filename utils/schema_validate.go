@@ -9,9 +9,17 @@ import (
 )
 
 var rootJSON map[string]interface{}
-var validErr error
 
 var schemaMutex sync.Mutex
+
+func hasSchema(jsonData map[string]interface{}) (bool, interface{}) {
+	if pm, sok := jsonData["@schemas"].(map[string]interface{}); sok {
+		if len(pm) > 0 {
+			return true, pm
+		}
+	}
+	return false, nil
+}
 
 func schemaForObject(targetObj map[string]interface{}) (string, interface{}) {
 	var retURI string
@@ -55,40 +63,32 @@ func doValidation(scmURI string, scmDat map[string]interface{}, targetObj interf
 }
 
 func validateSchema(basePath string, inputJSON interface{}) error {
+	var subErr error
 	if rawJSON, rok := inputJSON.(map[string]interface{}); rok {
-		for k, v := range rawJSON {
-			if k == "@schemas" {
-				schmURI, currentSchema := schemaForObject(rawJSON)
-				if currentSchemaMap, sok := currentSchema.(map[string]interface{}); sok {
-					tmperr := doValidation(schmURI, currentSchemaMap, rawJSON)
-					if tmperr != nil {
-						return tmperr
-					}
+		rhs, _ := hasSchema(rawJSON)
+		if rhs {
+			schmURI, currentSchema := schemaForObject(rawJSON)
+			if currentSchemaMap, sok := currentSchema.(map[string]interface{}); sok {
+				validationErr := doValidation(schmURI, currentSchemaMap, rawJSON)
+				if validationErr != nil {
+					return validationErr
 				}
-			} else {
-				switch v.(type) {
-				case map[string]interface{}:
-					if objData, ok := v.(map[string]interface{}); ok {
-						schmURI, currentSchema := schemaForObject(objData)
-						if currentSchemaMap, sok := currentSchema.(map[string]interface{}); sok {
-							tmperr := doValidation(schmURI, currentSchemaMap, v)
-							if tmperr != nil {
-								return tmperr
-							}
-						}
-						validateSchema(basePath, objData)
-					}
-				case []interface{}:
-					if rv, ok := v.([]interface{}); ok {
-						validateSchema(basePath, rv)
-					}
+			}
+		} else {
+			for _, v := range rawJSON {
+				subErr = validateSchema(basePath, v)
+				if subErr != nil {
+					return subErr
 				}
 			}
 		}
 	} else {
 		if rawJSON, rok := inputJSON.([]interface{}); rok {
 			for _, child := range rawJSON {
-				validateSchema(basePath, child)
+				subErr = validateSchema(basePath, child)
+				if subErr != nil {
+					return subErr
+				}
 			}
 		}
 	}
@@ -97,7 +97,6 @@ func validateSchema(basePath string, inputJSON interface{}) error {
 
 // ParseFileSchema Handles schema validation to the JSON Schema Draft 6 specification, returns any validations errors.
 func ParseFileSchema(filePath string, inJSON map[string]interface{}) (map[string]interface{}, error) {
-	validErr = nil
 	rootJSON = inJSON
 
 	validErr := validateSchema(filePath, rootJSON)

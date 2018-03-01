@@ -1,10 +1,19 @@
-hash: 152086a251461b94537f0f7844364473d408bc11472dfbb7000f3fd7176d8619
-updated: 2018-02-08T13:13:45.320356-05:00
+hash: 0fd92b9775f2a5cdcbe03109b84478c63285836a50ad79cad6236695980ec56d
+updated: 2018-03-01T13:14:54.332047-05:00
 imports:
-- name: github.com/dc0d/workerpool
-  version: 3d2f3651d7bd305d925aaae58c9409d8b90c265a
+- name: github.com/franela/goblin
+  version: a778490884355f67fd7f45812d14086e98315b67
 - name: github.com/gwicks/mergo
-  version: 49fa5e16021029db592476f130c34965d9ae15e2
+  version: 65305b34a1f9e380b22eee05e908838094a71a9c
+- name: github.com/labstack/gommon
+  version: 058e16e77bbd66cc101dfeae2971b88add6ce266
+  subpackages:
+  - color
+  - log
+- name: github.com/mattn/go-colorable
+  version: 7dc3415be66d7cc68bf0182f35c8d31f8d2ad8a7
+- name: github.com/mattn/go-isatty
+  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
 - name: github.com/santhosh-tekuri/jsonschema
   version: 63accc9deedeee33b7caf4e241f8a9ebdf031069
   subpackages:
@@ -14,16 +23,20 @@ imports:
   version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
+- name: github.com/valyala/bytebufferpool
+  version: e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7
+- name: github.com/valyala/fasttemplate
+  version: dcecefd839c4193db0d35b88ec65b4c12d360ab0
 - name: github.com/xeipuuv/gojsonpointer
   version: 4e3ac2762d5f479393488629ee9370b50873b3a6
 - name: github.com/xeipuuv/gojsonreference
   version: bd5ef7bd5415a7ac448318e64f11a24cd21e594b
 - name: golang.org/x/crypto
-  version: 5119cf507ed5294cc409c092980c7497ee5d6fd2
+  version: 91a49db82a88618983a78a06c1cbd4e00ab749ab
   subpackages:
   - ssh/terminal
 - name: golang.org/x/sys
-  version: 37707fdb30a5b38865cfb95e5aab41707daec7fd
+  version: f6cff0780e542efa0c8e864dc8fa522808f6a598
   subpackages:
   - unix
   - windows

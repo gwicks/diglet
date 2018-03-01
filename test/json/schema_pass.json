@@ -1,0 +1,15 @@
+{
+    "test": {
+        "@schemas": {
+            "nested_schema": {
+                "$ref": "../schema/nested_schema.json"
+            }
+        },
+        "foo": "baz",
+        "bar": {"$ref": "#/test/foo"}
+    },
+    "result": {
+        "bar": "baz",
+        "foo": "baz"
+    }
+}

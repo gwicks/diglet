@@ -1,7 +1,0 @@
-{
-    "name": "Module A",
-    "something": {
-        "other": [ "default_one" ],
-        "test": [ "post_default" ]
-    }
-}

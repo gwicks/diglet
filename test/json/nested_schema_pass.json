@@ -1,14 +1,4 @@
 {
-    "schema_pass": true,
-    "foo": {
-        "bar": "baz"
-    },
-    "qux": {
-        "@doc": {
-            "resolve": false
-        },
-        "$ref": "#/foo"
-    },
     "test": {
         "foo": {
             "@schemas": {

@@ -1,8 +1,0 @@
-[
-    {
-        "$ref": "./sub/content.json"
-    },
-    {
-        "$ref": "./sub/static.json"
-    }
-]
