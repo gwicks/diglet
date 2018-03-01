@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/gwicks/diglet/commands"
+	"github.com/gwicks/diglet/cli/commands"
 	"github.com/urfave/cli"
 )
 
@@ -20,7 +20,7 @@ func makeGlobalApp() *cli.App {
 	app := cli.NewApp()
 	app.Name = "diglet"
 	app.Usage = "JSON Compiler and Schema Validator"
-	app.Version = "0.2.5"
+	app.Version = "0.3.0"
 	app.Flags = []cli.Flag{}
 
 	return app
