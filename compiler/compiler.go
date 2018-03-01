@@ -9,7 +9,7 @@ import (
 
 // CompileFile - Reads the JSON file at the given path and compiles it
 func CompileFile(filePath string) (string, error) {
-	var rootJSON interface{}
+	var rootJSON map[string]interface{}
 
 	fd, err := ioutil.ReadFile(filePath)
 	if err != nil {

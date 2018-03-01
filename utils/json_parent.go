@@ -7,7 +7,6 @@ import (
 )
 
 var parentParseJSON map[string]interface{}
-var outJSON map[string]interface{}
 
 var lastParent map[string]interface{}
 var currentPathParent string
@@ -129,9 +128,9 @@ func resolveParents(basePath string, inputJSON interface{}, lastObject map[strin
 
 // ParseFileParent Parses out parenting for a given file, with children overriding values in a parent, unless they are explicitly locked.
 func ParseFileParent(filePath string, inJSON map[string]interface{}) (map[string]interface{}, error) {
-	outJSON = make(map[string]interface{})
 	parentParseJSON = inJSON
 
 	resolveParents(filePath, parentParseJSON, nil)
+
 	return parentParseJSON, nil
 }

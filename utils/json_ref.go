@@ -181,15 +181,10 @@ func resolveRefs(basePath string, inputJSON interface{}, parentHolder interface{
 }
 
 // ParseFileRefs Parses the $ref tags within a JSON file and resolves them to whatever the reference
-func ParseFileRefs(filePath string, inJSON interface{}) (interface{}, error) {
+func ParseFileRefs(filePath string, inJSON map[string]interface{}) (interface{}, error) {
+	parentJSON = inJSON
 
-	if inObj, ok := inJSON.(map[string]interface{}); ok {
-		parentJSON = inObj
+	resolveRefs(filePath, parentJSON, nil, "", -1)
 
-		resolveRefs(filePath, parentJSON, nil, "", -1)
-
-		return parentJSON, nil
-	}
-
-	return nil, nil
+	return parentJSON, nil
 }
