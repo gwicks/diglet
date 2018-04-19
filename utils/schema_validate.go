@@ -56,10 +56,7 @@ func doValidation(scmURI string, scmDat map[string]interface{}, targetObj interf
 		return serr
 	}
 
-	if verr := schema.Validate(strings.NewReader(string(marshaledObj))); verr != nil {
-		return verr
-	}
-	return nil
+	return schema.Validate(strings.NewReader(string(marshaledObj)))
 }
 
 func validateSchema(basePath string, inputJSON interface{}) error {
@@ -72,6 +69,11 @@ func validateSchema(basePath string, inputJSON interface{}) error {
 				validationErr := doValidation(schmURI, currentSchemaMap, rawJSON)
 				if validationErr != nil {
 					return validationErr
+				}
+
+				subErr = validateSchema(basePath, rawJSON)
+				if subErr != nil {
+					return subErr
 				}
 			}
 		} else {

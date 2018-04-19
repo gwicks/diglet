@@ -1,4 +1,9 @@
 {
+    "@schemas" : {
+        "dummy" : {
+            "$ref" : "../schema/dummy.json"
+        }
+    },
     "schema_pass" : true,
     "foo": {
         "bar": "baz"
@@ -22,6 +27,22 @@
             "@doc": {
                 "resolve": false
             },
+            "$ref": "#/foo"
+        },
+        "rotten": {
+            "$ref": "#/qux"
+        }
+    },
+    "test_two": {
+        "@schemas" : {
+            "doc_resolve" : {
+                "$ref" : "../schema/doc_resolve.json"
+            }
+        },
+        "resolved": {
+            "$ref": "#/foo"
+        },
+        "raw": {
             "$ref": "#/foo"
         },
         "rotten": {
