@@ -65,7 +65,10 @@ func mergeObjects(dest map[string]interface{}, src map[string]interface{}) {
 	restoreObject := saveLockObj(lnames, src)
 	if len(lnames) > 0 {
 		mergo.Merge(&dest, src)
-		mergo.Merge(&dest, restoreObject, mergo.WithOverride)
+		for rk, rv := range restoreObject {
+			dest[rk] = rv
+		}
+		// mergo.Merge(&dest, restoreObject, mergo.WithOverride)
 	} else {
 		mergo.Merge(&dest, src)
 	}

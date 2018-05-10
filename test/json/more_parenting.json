@@ -1,0 +1,22 @@
+{
+    "@parent": [
+        {
+            "@lock_names": ["routes", "modules"],
+            "routes": {
+                "good": "boy"
+            },
+            "modules": {
+                "yes": "oh yeah"
+            }
+        },
+        {
+            "routes": {
+                "no": "bad"
+            },
+            "modules": {
+                "bad": "diglet"
+            }
+        }
+    ],
+    "theme": "eu"
+}
