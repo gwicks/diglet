@@ -1,9 +1,10 @@
 package utils
 
 import (
-	"encoding/json"
 	"strings"
 	"sync"
+
+	json "github.com/json-iterator/go"
 
 	"github.com/santhosh-tekuri/jsonschema"
 )

@@ -14,3 +14,5 @@ import:
   version: master
 - package: github.com/franela/goblin
   version: master
+- package: github.com/json-iterator/go
+  version: master

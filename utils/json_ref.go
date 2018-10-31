@@ -1,7 +1,8 @@
 package utils
 
 import (
-	"encoding/json"
+	json "github.com/json-iterator/go"
+
 	"fmt"
 	"io/ioutil"
 	"path/filepath"

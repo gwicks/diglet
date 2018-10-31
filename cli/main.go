@@ -20,7 +20,7 @@ func makeGlobalApp() *cli.App {
 	app := cli.NewApp()
 	app.Name = "diglet"
 	app.Usage = "JSON Compiler and Schema Validator"
-	app.Version = "0.3.0"
+	app.Version = "0.3.5"
 	app.Flags = []cli.Flag{}
 
 	return app

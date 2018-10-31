@@ -1,43 +1,40 @@
-hash: 0fd92b9775f2a5cdcbe03109b84478c63285836a50ad79cad6236695980ec56d
-updated: 2018-03-01T13:14:54.332047-05:00
+hash: e3c826b416846d32a5c2a008ab3281e170530507d8e6e65d5e0d2767eed8c41a
+updated: 2018-10-31T16:25:57.339498945-04:00
 imports:
 - name: github.com/franela/goblin
-  version: a778490884355f67fd7f45812d14086e98315b67
+  version: 6af5ecb776ce11c0af2274dd0c1d49a8ed61b156
 - name: github.com/gwicks/mergo
   version: 65305b34a1f9e380b22eee05e908838094a71a9c
-- name: github.com/labstack/gommon
-  version: 058e16e77bbd66cc101dfeae2971b88add6ce266
-  subpackages:
-  - color
-  - log
-- name: github.com/mattn/go-colorable
-  version: 7dc3415be66d7cc68bf0182f35c8d31f8d2ad8a7
-- name: github.com/mattn/go-isatty
-  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
+- name: github.com/json-iterator/go
+  version: 05d041de1043ba04b678fb046bd35455a9b1b33b
+- name: github.com/konsorten/go-windows-terminal-sequences
+  version: b729f2633dfe35f4d1d8a32385f6685610ce1cb5
 - name: github.com/santhosh-tekuri/jsonschema
-  version: 63accc9deedeee33b7caf4e241f8a9ebdf031069
+  version: 1471bfd74cff003b1e329d46a4de4487e88cc47b
   subpackages:
+  - decoders
   - formats
   - loader
+  - mediatypes
 - name: github.com/sirupsen/logrus
-  version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
+  version: ad15b42461921f1fb3529b058c6786c6a45d5162
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
-- name: github.com/valyala/bytebufferpool
-  version: e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7
-- name: github.com/valyala/fasttemplate
-  version: dcecefd839c4193db0d35b88ec65b4c12d360ab0
 - name: github.com/xeipuuv/gojsonpointer
   version: 4e3ac2762d5f479393488629ee9370b50873b3a6
 - name: github.com/xeipuuv/gojsonreference
   version: bd5ef7bd5415a7ac448318e64f11a24cd21e594b
 - name: golang.org/x/crypto
-  version: 91a49db82a88618983a78a06c1cbd4e00ab749ab
+  version: b2aa35443fbc700ab74c586ae79b81c171851023
   subpackages:
   - ssh/terminal
 - name: golang.org/x/sys
-  version: f6cff0780e542efa0c8e864dc8fa522808f6a598
+  version: f67933eaf9e2f750f58a234209a11ebc1107be38
   subpackages:
   - unix
   - windows
-testImports: []
+testImports:
+- name: github.com/modern-go/concurrent
+  version: bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94
+- name: github.com/modern-go/reflect2
+  version: 94122c33edd36123c84d5368cfb2b69df93a0ec8
