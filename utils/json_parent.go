@@ -53,7 +53,11 @@ func saveLockObj(names []interface{}, target map[string]interface{}) map[string]
 
 	for _, name := range names {
 		if ns, lok := name.(string); lok {
-			retObj[ns] = target[ns]
+			if targetVal, ok := target[ns]; ok {
+				retObj[ns] = targetVal
+			} else {
+				retObj[ns] = map[string]interface{}{}
+			}
 		}
 	}
 
@@ -68,7 +72,6 @@ func mergeObjects(dest map[string]interface{}, src map[string]interface{}) {
 		for rk, rv := range restoreObject {
 			dest[rk] = rv
 		}
-		// mergo.Merge(&dest, restoreObject, mergo.WithOverride)
 	} else {
 		mergo.Merge(&dest, src)
 	}

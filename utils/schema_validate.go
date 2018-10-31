@@ -70,7 +70,6 @@ func validateSchema(basePath string, inputJSON interface{}) error {
 				if validationErr != nil {
 					return validationErr
 				}
-
 				subErr = validateSchema(basePath, rawJSON)
 				if subErr != nil {
 					return subErr

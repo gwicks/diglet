@@ -9,12 +9,15 @@ import (
 	"github.com/urfave/cli"
 )
 
-var rootJSON interface{}
-
 func compileAction(c *cli.Context) error {
 	cmdArgs := c.Args()
 	if len(cmdArgs) > 0 {
-		compileResult, err := compiler.CompileFile(cmdArgs[0])
+		compilerOpts := compiler.BuildOptions{
+			SkipResolve:   c.Bool("skip-resolve"),
+			SkipParenting: c.Bool("skip-parenting"),
+			SkipValidate:  c.Bool("skip-validation"),
+		}
+		compileResult, err := compiler.CompileFile(cmdArgs[0], compilerOpts)
 		if err != nil {
 			log.Error(err)
 			return err
@@ -37,5 +40,16 @@ func CompileCommand() cli.Command {
 		Aliases: []string{"c"},
 		Usage:   "Compile the source file and resolve it's dependencies",
 		Action:  compileAction,
+		Flags: []cli.Flag{
+			cli.BoolFlag{
+				Name: "skip-resolve",
+			},
+			cli.BoolFlag{
+				Name: "skip-parenting",
+			},
+			cli.BoolFlag{
+				Name: "skip-validation",
+			},
+		},
 	}
 }

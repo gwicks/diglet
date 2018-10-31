@@ -31,7 +31,7 @@ func TestCompileFile(t *testing.T) {
 		g.It("Should parse valid input", func() {
 			testFiles := []string{"../test/json/lock_parenting.json"}
 			for _, v := range testFiles {
-				result, err := CompileFile(v)
+				result, err := CompileFile(v, BuildOptions{})
 				if err != nil {
 					g.Fail(err)
 				}
@@ -48,7 +48,7 @@ func TestCompileFile(t *testing.T) {
 		g.It("Should error on bad path", func() {
 			testFiles := []string{"../test/json/notathing.json"}
 			for _, v := range testFiles {
-				result, err := CompileFile(v)
+				result, err := CompileFile(v, BuildOptions{})
 				g.Assert(len(result)).Equal(0)
 				g.Assert(err != nil)
 			}
