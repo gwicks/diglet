@@ -46,7 +46,7 @@ func doValidation(scmURI string, scmDat map[string]interface{}, targetObj interf
 	schemaMutex.Unlock()
 
 	compiler := jsonschema.NewCompiler()
-	compiler.Draft = jsonschema.Draft6
+	compiler.Draft = jsonschema.Draft7
 
 	if err := compiler.AddResource(url, strings.NewReader(string(marshaledSchema))); err != nil {
 		return err

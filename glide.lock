@@ -1,23 +1,27 @@
-hash: e3c826b416846d32a5c2a008ab3281e170530507d8e6e65d5e0d2767eed8c41a
-updated: 2018-10-31T16:25:57.339498945-04:00
+hash: 0b0fd5d598b9667795b2b844ec7fee1e3f5a8571a2e155809d1a12e8c4366663
+updated: 2018-11-27T10:35:47.646408442-05:00
 imports:
 - name: github.com/franela/goblin
   version: 6af5ecb776ce11c0af2274dd0c1d49a8ed61b156
 - name: github.com/gwicks/mergo
   version: 65305b34a1f9e380b22eee05e908838094a71a9c
 - name: github.com/json-iterator/go
-  version: 05d041de1043ba04b678fb046bd35455a9b1b33b
+  version: d05f387f50c0c406889b62cb5ec51c76a64d89ee
 - name: github.com/konsorten/go-windows-terminal-sequences
-  version: b729f2633dfe35f4d1d8a32385f6685610ce1cb5
+  version: 5c8c8bd35d3832f5d134ae1e1e375b69a4d25242
+- name: github.com/modern-go/concurrent
+  version: bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94
+- name: github.com/modern-go/reflect2
+  version: 94122c33edd36123c84d5368cfb2b69df93a0ec8
 - name: github.com/santhosh-tekuri/jsonschema
-  version: 1471bfd74cff003b1e329d46a4de4487e88cc47b
+  version: 0ee9a293098a7f5f24f50c3602b4f518aca50cbb
   subpackages:
   - decoders
   - formats
   - loader
   - mediatypes
 - name: github.com/sirupsen/logrus
-  version: ad15b42461921f1fb3529b058c6786c6a45d5162
+  version: bcd833dfe83d3cebad139e4a29ed79cb2318bf95
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: github.com/xeipuuv/gojsonpointer
@@ -25,16 +29,12 @@ imports:
 - name: github.com/xeipuuv/gojsonreference
   version: bd5ef7bd5415a7ac448318e64f11a24cd21e594b
 - name: golang.org/x/crypto
-  version: b2aa35443fbc700ab74c586ae79b81c171851023
+  version: e4dc69e5b2fd71dcaf8bd5d054eb936deb78d1fa
   subpackages:
   - ssh/terminal
 - name: golang.org/x/sys
-  version: f67933eaf9e2f750f58a234209a11ebc1107be38
+  version: 66b7b1311ac80bbafcd2daeef9a5e6e2cd1e2399
   subpackages:
   - unix
   - windows
-testImports:
-- name: github.com/modern-go/concurrent
-  version: bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94
-- name: github.com/modern-go/reflect2
-  version: 94122c33edd36123c84d5368cfb2b69df93a0ec8
+testImports: []

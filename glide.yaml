@@ -5,7 +5,7 @@ import:
 - package: github.com/sirupsen/logrus
   version: ^1.0.0
 - package: github.com/santhosh-tekuri/jsonschema
-  version: ^1.0.0
+  version: master
 - package: github.com/xeipuuv/gojsonpointer
   version: master
 - package: github.com/xeipuuv/gojsonreference
